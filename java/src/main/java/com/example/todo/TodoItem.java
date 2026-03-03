@@ -2,9 +2,10 @@ package com.example.todo;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 public class TodoItem implements Serializable {
 
@@ -15,15 +16,20 @@ public class TodoItem implements Serializable {
     private boolean isCompleted;
     private LocalDateTime createdAt;
 
-    private int internalId = 0;
-    private Map metadata = new HashMap();
+    private transient int internalId = 0;
+    private HashMap<String, Serializable> metadata = new HashMap<>();
 
     public TodoItem(String title, String description) {
         this.title = title;
         this.description = description;
         this.isCompleted = false;
         this.createdAt = LocalDateTime.now();
-        this.metadata.put("legacyDate", new Date("Jan 1, 2024"));
+        Date legacyDate = Date.from(
+                LocalDate.of(2024, 1, 1)
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+        );
+        this.metadata.put("legacyDate", legacyDate);
     }
 
     public String getTitle() {

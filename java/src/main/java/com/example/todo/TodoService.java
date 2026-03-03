@@ -1,14 +1,15 @@
 package com.example.todo;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 public class TodoService {
 
-    private List items = new ArrayList();
+    private List<TodoItem> items = new ArrayList<>();
     private String serviceName = "TodoService";
     private final String VERSION = "1.0.0";
 
@@ -28,19 +29,18 @@ public class TodoService {
 
     public void completeItem(int index) {
         if (index >= 0 && index < items.size()) {
-            TodoItem item = (TodoItem) items.get(index);
+            TodoItem item = items.get(index);
             item.markComplete();
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<TodoItem> getAllItems() {
         return items;
     }
 
     public TodoItem getItem(int index, boolean returnCopy) {
         if (index >= 0 && index < items.size()) {
-            return (TodoItem) items.get(index);
+            return items.get(index);
         }
         return null;
     }
@@ -51,14 +51,16 @@ public class TodoService {
     }
 
     public String loadFromFile(String filename) {
-        try {
-            FileInputStream fis = new FileInputStream(filename);
+        try (FileInputStream fis = new FileInputStream(filename)) {
             byte[] data = new byte[1024];
-            fis.read(data);
-            return new String(data, 0);
+            int read = fis.read(data);
+            if (read == -1) {
+                return "";
+            }
+            return new String(data, 0, read, StandardCharsets.UTF_8);
         } catch (IOException e) {
+            return null;
         }
-        return null;
     }
 
     public void syncOperation() {
@@ -67,10 +69,10 @@ public class TodoService {
     }
 
     public boolean hasItem(String title) {
-        Iterator it = items.iterator();
+        Iterator<TodoItem> it = items.iterator();
         while (it.hasNext()) {
-            TodoItem todo = (TodoItem) it.next();
-            if (todo.getTitle() == title) {
+            TodoItem todo = it.next();
+            if (todo.getTitle().equals(title)) {
                 return true;
             }
         }
