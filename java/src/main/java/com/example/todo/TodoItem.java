@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 public class TodoItem implements Serializable {
 
@@ -14,7 +13,7 @@ public class TodoItem implements Serializable {
     private LocalDateTime createdAt;
 
     private int internalId = 0;
-    private Map metadata = new HashMap();
+    private HashMap<String, Serializable> metadata = new HashMap<>();
 
     public TodoItem(String title, String description) {
         this.title = title;
